@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이츠쇼타임 무료 프로그램 받는 법</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#6d28d9">
+<style>
+  :root {
+    --bg: #f6f5f2; --card: #fff; --ink: #1f2328; --muted: #6b7280; --line: #e5e2dc;
+    --accent: #6d28d9; --accent-soft: #f1ebff; --yellow: #facc15; --yellow-soft: #fff4d6;
+    --navy: #242858; --ok: #15803d; --no: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif; line-height: 1.6; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px 48px; }
+  header.hero { background: var(--navy); color: #fff; padding: 36px 16px 32px; text-align: center; }
+  .hero .tag { display: inline-block; background: #c6f432; color: #1f2328; font-weight: 800; font-size: 13px; padding: 4px 12px; border-radius: 999px; }
+  .hero h1 { font-size: 28px; line-height: 1.3; margin: 12px 0 8px; }
+  .hero p { margin: 0; color: #d4d6f0; font-size: 15px; }
+  h2 { font-size: 21px; margin: 36px 0 12px; display: flex; align-items: center; gap: 8px; }
+  h2 .num { background: var(--accent); color: #fff; width: 30px; height: 30px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 16px; flex: none; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+  .flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: -18px; position: relative; }
+  .flow .step { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 10px; text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+  .flow .ico { font-size: 34px; line-height: 1; }
+  .flow b { display: block; margin-top: 6px; font-size: 15px; }
+  .flow span { font-size: 12.5px; color: var(--muted); }
+  .flow .step + .step::before { content: "›"; position: absolute; margin-left: -22px; margin-top: 18px; color: var(--accent); font-size: 26px; font-weight: 800; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 0; border-radius: 999px; padding: 12px 22px; font: inherit; font-weight: 800; font-size: 16px; cursor: pointer; text-decoration: none; }
+  .btn.main { background: var(--accent); color: #fff; }
+  .btn.sub { background: var(--accent-soft); color: var(--accent); }
+  .btn.yellow { background: var(--yellow); color: #1f2328; }
+  .center { text-align: center; }
+  /* 기기 표 */
+  .devices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .dev { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px 10px; text-align: center; }
+  .dev .big { font-size: 36px; line-height: 1.1; }
+  .dev h3 { margin: 6px 0 8px; font-size: 16px; }
+  .dev ul { list-style: none; padding: 0; margin: 0; font-size: 13.5px; text-align: left; }
+  .dev li { padding: 3px 0; display: flex; gap: 6px; align-items: baseline; }
+  .dev li .o { color: var(--ok); font-weight: 800; }
+  .dev li .x { color: #b0b0b0; font-weight: 800; }
+  .dev li.off { color: #a3a3a3; }
+  /* 주소 칸 */
+  .addr { background: linear-gradient(135deg, #6d28d9, #4c1d95); color: #fff; border-radius: 22px; padding: 22px 18px; display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; }
+  .addr h3 { margin: 0 0 4px; font-size: 20px; }
+  .addr p { margin: 0 0 12px; color: #e4dcff; font-size: 14px; }
+  .addr > div { min-width: 0; }
+  .urltext { display: block; text-decoration: none; background: #fff; color: var(--ink); border-radius: 14px; padding: 12px 14px; font-size: 17px; font-weight: 800; word-break: break-all; user-select: all; -webkit-user-select: all; }
+  .btn.ghost { background: rgba(255,255,255,.16); color: #fff; }
+  .addr .row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .addr .row .btn { padding: 10px 18px; font-size: 15px; }
+  .qr { background: #fff; border-radius: 14px; padding: 8px; text-align: center; color: var(--ink); }
+  .qr svg { width: 132px; height: 132px; display: block; }
+  .qr small { font-size: 11.5px; font-weight: 700; color: var(--muted); }
+  .copied { display: none; margin-top: 8px; font-weight: 800; color: var(--yellow); }
+  /* 탭 */
+  .tabs { display: flex; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 5px; position: sticky; top: 8px; z-index: 5; box-shadow: 0 4px 14px rgba(0,0,0,.06); }
+  .tabs button { flex: 1; border: 0; background: none; font: inherit; font-weight: 800; font-size: 15px; padding: 10px 4px; border-radius: 999px; cursor: pointer; color: var(--muted); }
+  .tabs button.on { background: var(--accent); color: #fff; }
+  .pane { display: none; }
+  .pane.on { display: block; }
+  .steps { display: grid; gap: 14px; margin-top: 14px; }
+  .s { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: grid; grid-template-columns: 1fr 230px; gap: 16px; align-items: center; }
+  .s .t { font-size: 17px; font-weight: 800; display: flex; gap: 8px; align-items: center; }
+  .s .t i { font-style: normal; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 1px 10px; font-size: 13px; flex: none; }
+  .s p { margin: 6px 0 0; color: #444; font-size: 14.5px; }
+  .s .warn { margin-top: 8px; background: var(--yellow-soft); color: #6b4a00; font-size: 13px; padding: 6px 10px; border-radius: 10px; font-weight: 700; }
+  /* 그림(가짜 화면) */
+  .mock { background: #eef0f4; border-radius: 14px; padding: 10px; font-size: 12px; color: #333; position: relative; overflow: hidden; min-height: 150px; }
+  .phone { width: 150px; margin: 0 auto; background: #fff; border: 5px solid #1f2328; border-radius: 22px; padding: 10px 8px; min-height: 230px; position: relative; font-size: 11px; }
+  .phone .notch { width: 50px; height: 8px; background: #1f2328; border-radius: 0 0 8px 8px; margin: -10px auto 8px; }
+  .bar { background: #f1f1f4; border-radius: 8px; padding: 4px 6px; font-size: 10px; color: #555; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file { display: flex; align-items: center; gap: 6px; background: #fff; border-radius: 8px; padding: 6px 8px; margin-bottom: 5px; font-size: 11.5px; }
+  .file .fi { width: 18px; height: 22px; background: #e8710a; border-radius: 3px; color: #fff; font-size: 7px; display: grid; place-items: center; font-weight: 800; flex: none; }
+  .file .dots { margin-left: auto; font-weight: 800; }
+  .hl { outline: 3px solid var(--yellow); outline-offset: 1px; border-radius: 8px; box-shadow: 0 0 0 6px rgba(250,204,21,.35); }
+  .menu { position: absolute; right: 12px; top: 64px; background: #fff; border-radius: 10px; box-shadow: 0 6px 18px rgba(0,0,0,.18); padding: 4px; width: 120px; font-size: 11.5px; }
+  .menu div { padding: 5px 8px; border-radius: 6px; }
+  .finger { position: absolute; font-size: 22px; filter: drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #f7f7f9; border-radius: 14px 14px 0 0; padding: 8px; box-shadow: 0 -4px 12px rgba(0,0,0,.12); }
+  .sheet div { background: #fff; border-radius: 8px; padding: 5px 7px; margin-top: 4px; display: flex; justify-content: space-between; }
+  .safari { position: absolute; left: 0; right: 0; bottom: 0; background: #f7f7f9; border-top: 1px solid #ddd; display: flex; justify-content: space-around; padding: 6px 0 8px; font-size: 14px; color: #0a84ff; }
+  .homegrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 6px; margin-top: 10px; }
+  .app { text-align: center; font-size: 9.5px; }
+  .app .ic { width: 34px; height: 34px; border-radius: 9px; margin: 0 auto 3px; background: #d6d9e0; }
+  .app img { width: 34px; height: 34px; border-radius: 9px; display: block; margin: 0 auto 3px; }
+  .chrome { background: #fff; border-radius: 10px; border: 1px solid #ccd; overflow: hidden; }
+  .chrome .top { background: #dfe3ea; padding: 5px 8px; display: flex; gap: 4px; align-items: center; }
+  .chrome .top i { width: 7px; height: 7px; border-radius: 50%; background: #fff; display: inline-block; }
+  .chrome .url { background: #fff; margin: 5px 8px; border-radius: 999px; padding: 3px 8px; font-size: 10.5px; color: #333; }
+  .chrome .body { padding: 8px; min-height: 70px; display: grid; place-items: center; color: #888; border-top: 1px solid #eee; font-size: 11px; }
+  .appmini { width: 100%; }
+  .appmini .h { font-weight: 800; color: var(--ink); font-size: 12px; }
+  .appmini .tb { display: flex; gap: 6px; margin: 5px 0; font-size: 10px; color: #777; }
+  .appmini .tb b { color: var(--accent); border-bottom: 2px solid var(--accent); }
+  .appmini .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .appmini .cal span { height: 12px; background: #f1f1f4; border-radius: 3px; }
+  .appmini .cal span.e { background: var(--accent); }
+  .tips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .tip { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+  .tip .e { font-size: 26px; line-height: 1; }
+  .tip b { display: block; font-size: 15px; }
+  footer { margin-top: 36px; text-align: center; color: var(--muted); font-size: 13.5px; }
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 23px; }
+    .s { grid-template-columns: 1fr; }
+    .addr { grid-template-columns: 1fr; }
+    .qr { display: none; }
+    .tips { grid-template-columns: 1fr; }
+    .devices { gap: 6px; }
+    .dev { padding: 10px 6px; }
+    .dev ul { font-size: 12px; }
+    .flow b { font-size: 13.5px; }
+    .flow .step + .step::before { display: none; }
+  }
+  @media print {
+    h2 { break-after: avoid; }
+    body { background: #fff; }
+    .tabs { display: none; }
+    .pane { display: block !important; break-inside: avoid-page; }
+    .pane h2.only-print { display: flex; }
+    .s, .tip, .dev, .addr, .card { break-inside: avoid; }
+    .addr .row { display: none; }
+    .copied { display: none !important; }
+  }
+  h2.only-print { display: none; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <span class="tag">이츠쇼타임 무료 프로그램</span>
+  <h1>받는 법 · 여는 법<br>그림으로 쉽게</h1>
+  <p>일정관리 · 블로그 도우미 · 쇼츠 메이커 — 설치·회원가입·월 사용료 없음</p>
+</header>
+
+<div class="wrap">
+  <div class="flow">
+    <div class="step"><div class="ico">📝</div><b>① 폼 적기</b><span>1분이면 끝</span></div>
+    <div class="step"><div class="ico">📩</div><b>② 메일 받기</b><span>바로 와요</span></div>
+    <div class="step"><div class="ico">💾</div><b>③ 내려받기</b><span>PC는 파일, 휴대폰은 주소</span></div>
+  </div>
+  <p class="center" style="margin:16px 0 0">
+    <a class="btn main" href="https://docs.google.com/forms/d/1FVzQvZ0b8lVir_1WYG728mkuPU9SsWdSsf4ER2vLUB4/viewform" target="_blank" rel="noopener">📝 무료 등록 폼 열기</a>
+  </p>
+  <p class="center" style="margin:6px 0 0;font-size:13px;color:var(--muted)">메일이 안 보이면 스팸함·프로모션함을 봐 주세요.</p>
+
+  <h2><span class="num">1</span>어떤 기기로 쓰세요?</h2>
+  <div class="devices">
+    <div class="dev"><div class="big">💻</div><h3>PC</h3><ul>
+      <li><span class="o">○</span>일정관리</li><li><span class="o">○</span>블로그 도우미</li><li><span class="o">○</span>쇼츠 메이커</li></ul></div>
+    <div class="dev"><div class="big">🤖</div><h3>갤럭시</h3><ul>
+      <li><span class="o">○</span>일정관리</li><li class="off"><span class="x">–</span>블로그 도우미</li><li class="off"><span class="x">–</span>쇼츠 메이커</li></ul></div>
+    <div class="dev"><div class="big">📱</div><h3>아이폰</h3><ul>
+      <li><span class="o">○</span>일정관리</li><li class="off"><span class="x">–</span>블로그 도우미</li><li class="off"><span class="x">–</span>쇼츠 메이커</li></ul></div>
+  </div>
+  <p style="font-size:13.5px;color:var(--muted);margin:8px 2px 0">블로그 도우미·쇼츠 메이커는 사진·영상을 많이 다뤄서 <b>PC 전용</b>이에요. 휴대폰에서는 <b>일정관리</b>를 주소로 열어 써요.</p>
+
+  <h2><span class="num">2</span>휴대폰 일정관리 주소</h2>
+  <div class="addr">
+    <div>
+      <h3>📱 아이폰 · 갤럭시는 이 주소로</h3>
+      <p>파일을 받을 필요 없이 주소만 열면 돼요. [복사]를 눌러 카톡·문자로 보내도 돼요.</p>
+      <a class="urltext" id="url" href="https://itsshow001-eng.github.io/itsshowtime/">https://itsshow001-eng.github.io/itsshowtime/</a>
+      <div class="row">
+        <button class="btn yellow" id="copyBtn" type="button">📋 주소 복사</button>
+        <a class="btn ghost" href="./">바로 열기 →</a>
+      </div>
+      <div class="copied" id="copied"></div>
+    </div>
+    <div class="qr"><svg xmlns="http://www.w3.org/2000/svg" width="222" height="222" class="segno"><g transform="scale(6)"><path fill="#fff" d="M0 0h37v37h-37z"/><path class="qrline" stroke="#1f2328" d="M2 2.5h7m2 0h2m1 0h2m1 0h1m1 0h5m1 0h1m2 0h7m-33 1h1m5 0h1m1 0h4m1 0h1m1 0h2m1 0h1m1 0h2m1 0h1m2 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m1 0h3m2 0h1m2 0h1m1 0h1m1 0h1m5 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m2 0h2m2 0h1m4 0h2m2 0h2m2 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m4 0h2m1 0h4m1 0h3m2 0h1m1 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m4 0h4m2 0h5m2 0h1m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-23 1h1m2 0h1m3 0h2m3 0h1m-22 1h3m1 0h2m8 0h3m1 0h1m1 0h1m8 0h2m-31 1h1m2 0h1m3 0h6m2 0h1m1 0h3m1 0h2m2 0h2m1 0h4m-32 1h2m2 0h6m2 0h3m1 0h1m5 0h2m2 0h3m1 0h2m-33 1h1m1 0h2m3 0h1m1 0h1m1 0h4m4 0h2m1 0h2m3 0h1m1 0h1m-30 1h2m2 0h5m1 0h1m3 0h1m1 0h1m1 0h1m3 0h1m2 0h1m1 0h3m2 0h1m-33 1h2m1 0h3m1 0h2m2 0h2m1 0h3m2 0h1m4 0h1m2 0h1m3 0h1m-30 1h1m1 0h3m2 0h1m2 0h4m3 0h3m4 0h1m-24 1h1m1 0h1m1 0h1m4 0h2m1 0h1m1 0h1m2 0h3m2 0h2m1 0h3m-29 1h3m1 0h2m1 0h1m1 0h5m3 0h3m1 0h4m1 0h3m-31 1h4m4 0h1m2 0h1m2 0h1m1 0h2m2 0h2m1 0h4m1 0h2m1 0h2m-33 1h2m1 0h5m2 0h1m4 0h2m3 0h1m1 0h1m2 0h4m1 0h2m-30 1h1m1 0h1m3 0h7m1 0h2m4 0h1m2 0h1m2 0h1m2 0h1m-29 1h2m1 0h1m1 0h2m4 0h4m3 0h1m2 0h2m3 0h2m-31 1h1m1 0h1m4 0h1m3 0h1m1 0h1m2 0h8m2 0h2m4 0h1m-30 1h2m1 0h3m1 0h2m2 0h1m1 0h2m5 0h2m3 0h2m1 0h2m-32 1h3m1 0h1m1 0h3m1 0h1m2 0h3m1 0h2m2 0h1m5 0h2m-30 1h1m1 0h1m2 0h4m1 0h1m1 0h1m5 0h2m3 0h7m1 0h2m-25 1h1m9 0h3m1 0h1m1 0h1m3 0h2m-30 1h7m2 0h1m1 0h1m1 0h1m1 0h1m2 0h4m1 0h2m1 0h1m1 0h1m-29 1h1m5 0h1m1 0h3m2 0h5m3 0h4m3 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m3 0h1m4 0h1m4 0h9m1 0h2m-32 1h1m1 0h3m1 0h1m1 0h3m2 0h3m4 0h1m6 0h1m1 0h1m1 0h2m-33 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h1m1 0h2m3 0h1m1 0h5m1 0h2m-31 1h1m5 0h1m1 0h1m4 0h2m2 0h2m4 0h3m1 0h2m3 0h1m-33 1h7m2 0h2m2 0h1m2 0h2m1 0h5m2 0h1m1 0h1m1 0h1"/></g></svg><small>PC 화면이라면<br>휴대폰 카메라로 찍으세요</small></div>
+  </div>
+
+  <h2><span class="num">3</span>기기별로 여는 법</h2>
+  <div class="tabs" role="tablist">
+    <button class="on" data-p="pc">💻 PC</button>
+    <button data-p="gal">🤖 갤럭시</button>
+    <button data-p="ios">📱 아이폰</button>
+  </div>
+
+  <!-- PC -->
+  <section class="pane on" id="p-pc">
+    <h2 class="only-print">💻 PC (세 프로그램 모두)</h2>
+    <div class="steps">
+      <div class="s">
+        <div><div class="t"><i>1단계</i>메일 버튼 → 드라이브 폴더</div>
+          <p>메일의 <b>[무료 프로그램 받으러 가기]</b>를 누르면 파일 3개가 있는 폴더가 열려요.</p></div>
+        <div class="mock">
+          <div class="bar">📁 이츠쇼타임 무료 프로그램</div>
+          <div class="file"><span class="fi">HTML</span>이츠쇼타임_일정관리.html</div>
+          <div class="file"><span class="fi">HTML</span>이츠쇼타임_블로그도우미.html</div>
+          <div class="file"><span class="fi">HTML</span>이츠쇼타임_쇼츠메이커.html</div>
+        </div>
+      </div>
+      <div class="s">
+        <div><div class="t"><i>2단계</i>[⋮] → [다운로드]</div>
+          <p>쓰고 싶은 파일 오른쪽 <b>점 3개(⋮)</b>를 누르고 <b>[다운로드]</b>.</p>
+          <div class="warn">⚠️ 파일 이름을 그냥 누르면 글자(코드)만 보여요. 꼭 [다운로드]!</div></div>
+        <div class="mock">
+          <div class="bar">📁 이츠쇼타임 무료 프로그램</div>
+          <div class="file hl"><span class="fi">HTML</span>이츠쇼타임_일정관리.html<span class="dots">⋮</span></div>
+          <div class="file"><span class="fi">HTML</span>이츠쇼타임_블로그도우미.html<span class="dots">⋮</span></div>
+          <div class="menu"><div>열기</div><div class="hl" style="font-weight:800">⬇ 다운로드</div><div>이름 바꾸기</div></div>
+          <div class="finger" style="right:22px;top:92px">👆</div>
+        </div>
+      </div>
+      <div class="s">
+        <div><div class="t"><i>3단계</i>크롬 창에 끌어다 놓기</div>
+          <p>받은 파일을 <b>크롬 창 위로 끌어다 놓으면</b> 열려요. (또는 파일에서 오른쪽 클릭 → 연결 프로그램 → Chrome)</p>
+          <p style="font-size:13px;color:var(--muted)">주소창이 <b>file:///</b>로 시작하면 잘 열린 거예요.</p></div>
+        <div class="mock" style="display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center">
+          <div class="file hl" style="flex-direction:column;width:62px;text-align:center;font-size:9.5px"><span class="fi" style="width:26px;height:32px">HTML</span>일정관리.html</div>
+          <div class="chrome"><div class="top"><i></i><i></i><i></i></div><div class="url">file:///C:/Users/…/일정관리.html</div>
+            <div class="body"><div class="appmini"><div class="h">이츠쇼타임 일정관리</div><div class="tb"><b>달력</b><span>목록</span><span>+ 공연 등록</span></div>
+            <div class="cal"><span></span><span></span><span class="e"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="e"></span><span></span><span></span></div></div></div></div>
+          <div class="finger" style="left:52px;top:62px">✋</div>
+        </div>
+      </div>
+      <div class="s">
+        <div><div class="t"><i>4단계</i>내 정보 적기</div>
+          <p>처음 열면 <b>설정</b>에서 회사 이름·문의처를 적어요. 다음부터는 <b>같은 PC의 같은 크롬</b>으로 열면 적은 내용이 그대로 있어요.</p>
+          <p style="font-size:13px;color:var(--muted)">💡 바탕화면에 두면 찾기 쉬워요.</p></div>
+        <div class="mock" style="display:grid;place-items:center">
+          <div style="background:#fff;border-radius:10px;padding:10px;width:100%">
+            <div style="font-weight:800;margin-bottom:6px">⚙️ 설정</div>
+            <div style="font-size:11px;color:#777">회사 이름</div><div class="bar" style="background:#fff;border:1px solid #ddd">○○공연팀</div>
+            <div style="font-size:11px;color:#777">문의처</div><div class="bar" style="background:#fff;border:1px solid #ddd;margin:0">010-0000-0000</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 갤럭시 -->
+  <section class="pane" id="p-gal">
+    <h2 class="only-print">🤖 갤럭시 (일정관리)</h2>
+    <div class="steps">
+      <div class="s">
+        <div><div class="t"><i>1단계</i>크롬으로 주소 열기</div>
+          <p>위 <b>휴대폰 일정관리 주소</b>를 [복사]해서 <b>크롬</b> 주소창에 붙여 넣어요. 메일 속 주소를 눌러도 돼요.</p></div>
+        <div class="mock"><div class="phone"><div class="notch"></div>
+          <div class="bar hl">itsshow001-eng.github.io/itsshowtime</div>
+          <div class="appmini"><div class="h">이츠쇼타임 일정관리</div><div class="tb"><b>달력</b><span>목록</span><span>+등록</span></div>
+          <div class="cal"><span></span><span></span><span class="e"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="e"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+        </div></div>
+      </div>
+      <div class="s">
+        <div><div class="t"><i>2단계</i>[⋮] → [홈 화면에 추가]</div>
+          <p>크롬 오른쪽 위 <b>점 3개(⋮)</b> → <b>[홈 화면에 추가]</b> → [추가].</p></div>
+        <div class="mock"><div class="phone"><div class="notch"></div>
+          <div class="bar" style="display:flex;justify-content:space-between"><span>itsshow001-eng.github…</span><b class="hl" style="padding:0 3px">⋮</b></div>
+          <div class="menu" style="top:46px;right:10px;width:118px"><div>새 탭</div><div>북마크</div><div class="hl" style="font-weight:800">📲 홈 화면에 추가</div><div>설정</div></div>
+          <div class="finger" style="right:20px;top:96px">👆</div>
+        </div></div>
+      </div>
+      <div class="s">
+        <div><div class="t"><i>3단계</i>아이콘으로 열기</div>
+          <p>홈 화면에 생긴 <b>보라색 달력 아이콘(일정관리)</b>을 눌러 써요.</p>
+          <p style="font-size:13px;color:var(--muted)">파일로 써도 돼요: 드라이브에서 [다운로드] → 내 파일 → 다운로드 → 눌러서 [Chrome]으로 열기</p></div>
+        <div class="mock"><div class="phone"><div class="notch"></div>
+          <div class="homegrid">
+            <div class="app"><div class="ic"></div>전화</div><div class="app"><div class="ic"></div>메시지</div><div class="app"><div class="ic"></div>카메라</div>
+            <div class="app"><div class="ic"></div>갤러리</div><div class="app hl" style="border-radius:10px"><img src="icon-192.png" alt="">일정관리</div><div class="app"><div class="ic"></div>크롬</div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 아이폰 -->
+  <section class="pane" id="p-ios">
+    <h2 class="only-print">📱 아이폰 (일정관리)</h2>
+    <div class="steps">
+      <div class="s">
+        <div><div class="t"><i>1단계</i>사파리로 주소 열기</div>
+          <p>위 <b>휴대폰 일정관리 주소</b>를 [복사]해서 <b>사파리</b> 주소창에 붙여 넣어요. 메일 속 주소를 눌러도 돼요.</p>
+          <div class="warn">⚠️ 아이폰은 파일을 내려받으면 '미리보기'로만 열려서 버튼이 안 눌려요. 꼭 주소로 여세요.</div></div>
+        <div class="mock"><div class="phone"><div class="notch"></div>
+          <div class="appmini"><div class="h">이츠쇼타임 일정관리</div>
+          <div style="background:var(--yellow-soft);color:#6b4a00;border-radius:6px;padding:3px 5px;font-size:9px;margin:4px 0">📱 홈 화면에 추가해서 쓰세요</div>
+          <div class="cal"><span></span><span></span><span class="e"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span class="e"></span><span></span><span></span></div></div>
+          <div class="safari"><span>‹</span><span>›</span><span class="hl" style="padding:0 4px">⬆︎</span><span>📖</span><span>⧉</span></div>
+          <div class="finger" style="left:62px;bottom:-2px">👆</div>
+        </div></div>
+      </div>
+      <div class="s">
+        <div><div class="t"><i>2단계</i>[공유 ⬆︎] → [홈 화면에 추가]</div>
+          <p>아래 가운데 <b>공유 버튼(네모에 화살표 ⬆︎)</b> → 아래로 조금 내려서 <b>[홈 화면에 추가]</b> → 오른쪽 위 [추가].</p></div>
+        <div class="mock"><div class="phone"><div class="notch"></div>
+          <div class="sheet">
+            <div><span>복사</span><span>⧉</span></div>
+            <div><span>읽기 목록에 추가</span><span>👓</span></div>
+            <div class="hl" style="font-weight:800"><span>홈 화면에 추가</span><span>⊞</span></div>
+            <div><span>북마크 추가</span><span>📖</span></div>
+          </div>
+          <div class="finger" style="right:14px;bottom:44px">👆</div>
+        </div></div>
+      </div>
+      <div class="s">
+        <div><div class="t"><i>3단계</i>아이콘으로만 열기</div>
+          <p>홈 화면에 생긴 <b>보라색 달력 아이콘(일정관리)</b>으로 열어서 써요.</p>
+          <div class="warn">💡 사파리 창에서 적은 내용은 아이콘 쪽에 안 보여요. 처음부터 아이콘으로 쓰세요.</div></div>
+        <div class="mock"><div class="phone"><div class="notch"></div>
+          <div class="homegrid">
+            <div class="app"><div class="ic"></div>전화</div><div class="app"><div class="ic"></div>메시지</div><div class="app"><div class="ic"></div>사진</div>
+            <div class="app"><div class="ic"></div>캘린더</div><div class="app hl" style="border-radius:10px"><img src="icon-192.png" alt="">일정관리</div><div class="app"><div class="ic"></div>사파리</div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <h2><span class="num">4</span>꼭 알아 두세요</h2>
+  <div class="tips">
+    <div class="tip"><div class="e">🔒</div><div><b>내 기기 안에만 저장</b>적은 내용과 사진은 인터넷으로 보내지 않아요.</div></div>
+    <div class="tip"><div class="e">↔️</div><div><b>PC와 휴대폰은 따로</b>PC에 적은 공연은 휴대폰에 안 보여요. (함께 쓰기는 프리미엄)</div></div>
+    <div class="tip"><div class="e">💾</div><div><b>일주일에 한 번 백업</b>브라우저 기록을 지우면 내용도 지워져요. [백업 파일 받기]를 해 두세요.</div></div>
+    <div class="tip"><div class="e">🆕</div><div><b>새 버전은 메일로</b>PC는 새 파일을 받아 열면 내용이 이어지고, 휴대폰 주소는 저절로 새 버전이 돼요.</div></div>
+  </div>
+
+  <footer>
+    만든 곳 <b>키즈니버스랩</b> · 010-2485-8561 · itsshow001@naver.com
+  </footer>
+</div>
+
+<script>
+  // 탭
+  document.querySelectorAll('.tabs button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.tabs button').forEach((x) => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.pane').forEach((p) => p.classList.toggle('on', p.id === 'p-' + b.dataset.p));
+  }));
+  // 아이폰·갤럭시로 열면 그 탭부터
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) document.querySelector('[data-p=ios]').click();
+  else if (/Android/.test(ua)) document.querySelector('[data-p=gal]').click();
+  // 주소 복사
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    const text = document.getElementById('url').textContent.trim();
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {}
+    if (!ok) {
+      const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, 999);
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      ta.remove();
+    }
+    const m = document.getElementById('copied');
+    m.textContent = ok ? '✅ 복사했어요! 사파리·크롬 주소창에 붙여 넣으세요.' : '주소 글자를 길게 눌러 [복사]해 주세요.';
+    m.style.display = 'block';
+    document.getElementById('copyBtn').textContent = ok ? '✓ 복사됨' : '📋 주소 복사';
+  });
+</script>
+</body>
+</html>
