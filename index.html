@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>이츠쇼타임 일정관리</title>
+<!-- 아이폰 홈 화면 아이콘 (인터넷 주소로 열 때만 쓰임, 파일로 열 때는 없어도 됨) -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="일정관리">
+<meta name="theme-color" content="#6d28d9">
+<style>
+  :root {
+    --bg: #f6f5f2; --card: #ffffff; --ink: #1f2328; --muted: #6b7280; --line: #e5e2dc;
+    --accent: #6d28d9; --accent-soft: #f1ebff; --ok: #15803d; --ok-soft: #e9f8ee;
+    --warn: #b45309; --warn-soft: #fff7e0; --fail: #b91c1c; --fail-soft: #fdecec;
+    --st-inq: #b45309; --st-ok: #6d28d9; --st-done: #15803d; --st-cancel: #9ca3af;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15171a; --card: #1e2126; --ink: #e8e6e3; --muted: #9aa0a6; --line: #2f333a;
+      --accent: #a78bfa; --accent-soft: #241c38; --ok: #4ade80; --ok-soft: #12261a;
+      --warn: #fbbf24; --warn-soft: #2a2312; --fail: #f87171; --fail-soft: #2b1616;
+      --st-inq: #fbbf24; --st-ok: #a78bfa; --st-done: #4ade80; --st-cancel: #6b7280;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.6 "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; }
+  header { padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--card); }
+  header h1 { margin: 0; font-size: 18px; }
+  header .sub { color: var(--muted); font-size: 12px; }
+  .iosnote { margin-top: 8px; padding: 8px 10px; border-radius: 10px; background: #fff4d6; color: #6b4a00; font-size: 13px; line-height: 1.5; }
+  nav { display: flex; gap: 4px; padding: 0 20px; background: var(--card); border-bottom: 1px solid var(--line); overflow-x: auto; }
+  nav button { border: 0; background: none; padding: 12px 14px; font: inherit; color: var(--muted); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; }
+  nav button.on { color: var(--ink); font-weight: 700; border-bottom-color: var(--accent); }
+  main { max-width: 1280px; margin: 0 auto; padding: 18px 20px 60px; }
+  section { display: none; }
+  section.on { display: block; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .card h2 { margin: 0 0 10px; font-size: 16px; }
+  .help { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+  .field2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  label { font-size: 13px; color: var(--muted); }
+  input, select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 7px 9px; min-width: 0; width: 100%; }
+  input[type=checkbox] { width: auto; }
+  textarea { min-height: 70px; resize: vertical; }
+  .btn { display: inline-block; font: inherit; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 8px; padding: 7px 12px; cursor: pointer; text-decoration: none; width: auto; }
+  .btn.main { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
+  .btn.danger { color: var(--fail); }
+  .btn:disabled { opacity: .45; cursor: default; }
+  .btn.sm { padding: 3px 9px; font-size: 12px; }
+  @media (max-width: 760px) { .field2, .field3 { grid-template-columns: 1fr; } }
+  .small { font-size: 12px; color: var(--muted); }
+  .notice { padding: 8px 10px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); font-size: 13px; margin-bottom: 10px; white-space: pre-wrap; }
+  .notice:empty { display: none; }
+  .kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .kpi div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+  .kpi b { display: block; font-size: 22px; }
+  .kpi span { font-size: 12px; color: var(--muted); }
+  .st { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 0 8px; color: #fff; white-space: nowrap; }
+  .st.문의 { background: var(--st-inq); } .st.확정 { background: var(--st-ok); } .st.완료 { background: var(--st-done); } .st.취소 { background: var(--st-cancel); }
+  .calhead { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .calhead h2 { margin: 0; min-width: 120px; }
+  .cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+  .cal .w { text-align: center; font-size: 12px; color: var(--muted); padding: 2px 0; }
+  .cal .d { min-height: 96px; border: 1px solid var(--line); border-radius: 8px; padding: 4px; background: var(--bg); overflow: hidden; cursor: pointer; }
+  .cal .d.empty { border: 0; background: none; cursor: default; }
+  .cal .d.today { border: 2px solid var(--accent); }
+  .cal .d .n { font-size: 12px; font-weight: 700; }
+  .cal .d .n.sun { color: var(--fail); }
+  .chip { display: block; font-size: 11px; line-height: 1.35; padding: 2px 4px; margin-top: 2px; border-left: 3px solid var(--st-ok); border-radius: 4px; background: var(--card); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .chip.문의 { border-left-color: var(--st-inq); } .chip.완료 { border-left-color: var(--st-done); } .chip.취소 { border-left-color: var(--st-cancel); text-decoration: line-through; color: var(--muted); }
+  @media (max-width: 760px) { .cal .d { min-height: 64px; } .chip { font-size: 10px; } }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+  tr.pick { cursor: pointer; } tr.pick:hover td { background: var(--accent-soft); }
+  .tablewrap { overflow-x: auto; }
+  .dday { font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 8px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 10; }
+  .toast.show { opacity: .95; }
+  .hide { display: none !important; }
+  .premium { background: #12142b; color: #f5f2f7; border-radius: 16px; padding: 18px 20px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; position: relative; overflow: hidden; }
+  .premium .bub { position: absolute; border: 2px solid #60acdc; border-radius: 999px; opacity: .25; pointer-events: none; }
+  .premium .txt { flex: 1 1 320px; min-width: 0; position: relative; }
+  .premium .chip2 { display: inline-block; background: #b8f030; color: #242858; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 1px 10px; }
+  .premium h2 { margin: 6px 0 4px; font-size: 20px; color: #fff; }
+  .premium .flow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13px; }
+  .premium .flow span { background: #1c1f3d; border-radius: 999px; padding: 2px 10px; }
+  .premium .flow b { color: #60acdc; }
+  .premium .act { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; position: relative; }
+  .premium a.go { background: #d8a85c; color: #242858; font-weight: 700; text-decoration: none; border-radius: 999px; padding: 10px 22px; }
+  .premium .price { font-size: 13px; color: #f5f2f7; }
+  .premium .price s { color: #b8b4c6; }
+  .premium button.fold { background: none; border: 0; color: #b8b4c6; font: inherit; font-size: 12px; cursor: pointer; padding: 0; text-decoration: underline; }
+  .premium.mini { padding: 10px 16px; }
+  .premium.mini .full { display: none; }
+  .premium:not(.mini) .short { display: none; }
+  .freeapps { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: -6px 0 16px; font-size: 13px; }
+  .freeapps .lbl { color: var(--muted); font-weight: 700; margin-right: 2px; }
+  .freeapps a, .freeapps span.app { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 5px 12px; text-decoration: none; }
+  .freeapps a:hover { border-color: var(--accent); }
+  .freeapps .now { background: var(--accent-soft); border-color: var(--accent); font-weight: 700; }
+  .freeapps .soon { color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>이츠쇼타임 일정관리 <span class="small">무료판</span></h1>
+  <div class="sub">공연 일정을 달력과 목록으로 관리해요. PC·갤럭시·아이폰에서 쓸 수 있어요. 적은 내용은 지금 쓰는 기기 안에만 있고, 인터넷으로 보내지 않아요(PC와 휴대폰 내용은 따로예요).</div>
+  <div class="iosnote" id="iosNote" hidden>📱 <b>아이폰은 홈 화면에 추가해서 쓰세요.</b> 아래 [공유] 버튼 → [홈 화면에 추가] → 생긴 <b>일정관리</b> 아이콘으로 열어요.<br>사파리에서 바로 적은 내용은 홈 화면 아이콘에 보이지 않고, 사파리를 7일 넘게 안 쓰면 지워질 수 있어요.</div>
+</header>
+<nav id="tabs">
+  <button data-tab="cal" class="on">달력</button>
+  <button data-tab="list">목록</button>
+  <button data-tab="form">+ 공연 등록</button>
+  <button data-tab="settings">백업 · 내보내기</button>
+</nav>
+<main>
+<!-- 이츠쇼타임 프리미엄 소개 (무료판 3개 공통, 일정관리 문구) -->
+<div class="premium" id="premium">
+  <div class="bub" style="width:160px;height:160px;top:-60px;right:30%" aria-hidden="true"></div>
+  <div class="bub" style="width:60px;height:60px;bottom:-20px;left:40%" aria-hidden="true"></div>
+  <div class="txt full">
+    <span class="chip2">이츠쇼타임 프리미엄</span>
+    <h2>공연 일정만 전문적으로 관리할 수 있는 프로그램을 찾으세요?</h2>
+    <div class="flow"><span>공연관리 ERP</span><b>→</b><span>SNS ERP</span><b>→</b><span>쇼츠 스튜디오</span></div>
+  </div>
+  <div class="txt short"><span class="chip2">이츠쇼타임 프리미엄</span> 문의부터 정산·후기·쇼츠까지 한곳에서</div>
+  <div class="act">
+    <a class="go" id="premiumLink" href="https://claude.ai/artifact/T4vzfoUkP3fkg8LupjCwgE" target="_blank" rel="noopener">프리미엄 자세히 보기</a>
+    <span class="price full">얼리버드 <b>99,000원</b> <s>199,000원</s> · 키즈니버스랩</span>
+    <button class="fold" id="premiumFold" type="button">작게 보기</button>
+  </div>
+</div>
+<!-- 이츠쇼타임 무료 프로그램 (서로 받기) : 버튼은 공개 구글 드라이브 폴더를 연다 -->
+<div class="freeapps" id="freeApps"></div>
+
+<div class="kpi" id="kpi"></div>
+
+<!-- 달력 -->
+<section id="cal" class="on">
+  <div class="card">
+    <div class="calhead">
+      <button class="btn sm" id="prevM" aria-label="이전 달">◀</button>
+      <h2 id="calTitle"></h2>
+      <button class="btn sm" id="nextM" aria-label="다음 달">▶</button>
+      <button class="btn sm" id="thisM">이번 달</button>
+      <span class="small">날짜를 누르면 그날 공연을 등록하고, 공연을 누르면 고칠 수 있어요.</span>
+    </div>
+    <div class="cal" id="calGrid"></div>
+    <div class="row small" style="margin-top:10px"><span class="st 문의">문의</span><span class="st 확정">확정</span><span class="st 완료">완료</span><span class="st 취소">취소</span></div>
+  </div>
+</section>
+
+<!-- 목록 -->
+<section id="list">
+  <div class="card">
+    <div class="row">
+      <select id="lRange" style="width:auto"><option value="up">다가오는 공연</option><option value="past">지난 공연</option><option value="all">전체</option></select>
+      <select id="lStatus" style="width:auto"><option value="">모든 상태</option><option>문의</option><option>확정</option><option>완료</option><option>취소</option></select>
+      <input type="search" id="lSearch" placeholder="기관·공연·지역·담당자 찾기" style="max-width:260px">
+      <span class="small" id="lCount"></span>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>날짜</th><th>시간</th><th>상태</th><th>기관·행사</th><th>공연</th><th>지역</th><th>담당자</th></tr></thead>
+      <tbody id="lBody"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- 공연 등록 · 고치기 -->
+<section id="form">
+  <div class="card">
+    <h2 id="fTitle">새 공연 등록</h2>
+    <p class="help">문의 전화를 받으며 위에서부터 차례로 적으면 돼요. 빈칸이 있어도 저장할 수 있어요.</p>
+    <div class="notice" id="fNotice"></div>
+    <div class="field3">
+      <div class="field"><label>날짜 *</label><input type="date" id="fDate"></div>
+      <div class="field"><label>시작 시간</label><input type="time" id="fTime"></div>
+      <div class="field"><label>상태</label><select id="fStatus"><option>문의</option><option>확정</option><option>완료</option><option>취소</option></select></div>
+    </div>
+    <div class="field2">
+      <div class="field"><label>기관·행사처 *</label><input type="text" id="fOrg" placeholder="예: 햇살어린이집"></div>
+      <div class="field"><label>행사 이름</label><input type="text" id="fEvent" placeholder="예: 크리스마스 행사"></div>
+      <div class="field"><label>담당자</label><input type="text" id="fPerson" placeholder="예: 김OO 원장님"></div>
+      <div class="field"><label>연락처</label><input type="tel" id="fPhone" placeholder="010-0000-0000"></div>
+      <div class="field"><label>지역</label><input type="text" id="fRegion" placeholder="예: 천안"></div>
+      <div class="field"><label>공연</label><input type="text" id="fShow" list="showNames" placeholder="예: 버블쇼"><datalist id="showNames"></datalist></div>
+    </div>
+    <div class="field2">
+      <div class="field"><label>공연 시간(길이)</label><input type="text" id="fLen" placeholder="예: 50분"></div>
+      <div class="field"><label>관람 인원·연령</label><input type="text" id="fAud" placeholder="예: 5~7세 60명"></div>
+    </div>
+    <div class="field"><label>자세한 주소</label><input type="text" id="fAddr" placeholder="공연 장소 주소"></div>
+    <div class="field"><label>메모 (도착 시간, 주차, 준비물 등)</label><textarea id="fMemo"></textarea></div>
+    <div class="row">
+      <button class="btn main" id="fSave">저장</button>
+      <button class="btn" id="fNew">새로 쓰기</button>
+      <button class="btn" id="fCopy" disabled>이 공연 복사해서 새로</button>
+      <button class="btn danger" id="fDel" disabled>지우기</button>
+    </div>
+  </div>
+</section>
+
+<!-- 백업 · 내보내기 -->
+<section id="settings">
+  <div class="card">
+    <h2>휴대폰 달력에 넣기</h2>
+    <p class="help">확정된 앞으로의 공연을 달력 파일(.ics)로 받아요. 휴대폰으로 보내 열면 구글 캘린더·아이폰 캘린더에 들어가요. 연락처는 넣지 않아요.</p>
+    <button class="btn" id="btnIcs">달력 파일 받기 (.ics)</button>
+  </div>
+  <div class="card">
+    <h2>엑셀로 보기</h2>
+    <p class="help">모든 공연을 CSV 파일로 받아요. 엑셀에서 열 수 있어요.</p>
+    <button class="btn" id="btnCsv">CSV 받기</button>
+  </div>
+  <div class="card">
+    <h2>백업</h2>
+    <p class="help">브라우저 기록(크롬·사파리의 사이트 데이터)을 지우면 이 프로그램의 내용도 지워져요. 일주일에 한 번은 백업 파일을 받아 두세요. 다른 기기로 옮길 때도 써요.</p>
+    <div class="row">
+      <button class="btn main" id="btnExport">백업 파일 받기</button>
+      <label class="btn" style="cursor:pointer">백업 파일로 되돌리기<input type="file" id="fileImport" accept=".json,application/json" hidden></label>
+      <span class="small" id="backupInfo"></span>
+    </div>
+  </div>
+  <p class="small">이츠쇼타임 일정관리 무료판 · 만든 곳 이츠쇼컴퍼니</p>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  let toastTimer;
+  const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400); };
+  const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const today = () => ymd(new Date());
+  const WD = '일월화수목금토';
+  const wd = (iso) => { const d = new Date(iso + 'T00:00:00'); return isNaN(d) ? '' : WD[d.getDay()]; };
+  const download = (text, name, type) => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); };
+
+  // ── 저장 (이 프로그램 전용 이름) ──
+  const KEY = 'itsshowtime_free_schedule_v1';
+  let db = { shows: [], lastBackup: '' };
+  try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v && Array.isArray(v.shows)) db = v; } catch (e) { /* 처음 */ }
+  const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); return true; } catch (e) { toast('저장하지 못했어요. 크롬 저장 공간을 확인하세요.'); return false; } };
+  const byDate = (a, b) => (a.date + (a.time || '99')).localeCompare(b.date + (b.time || '99'));
+
+  // ── 탭 ──
+  const showTab = (name) => {
+    document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.tab === name));
+    document.querySelectorAll('main > section').forEach((s) => s.classList.toggle('on', s.id === name));
+  };
+  $('tabs').addEventListener('click', (e) => { const t = e.target.dataset.tab; if (!t) return; if (t === 'form' && editing) clearForm(); showTab(t); });
+
+  // ── 요약 ──
+  const dday = (iso) => { const n = Math.round((new Date(iso + 'T00:00:00') - new Date(today() + 'T00:00:00')) / 86400000); return n === 0 ? '오늘' : n > 0 ? `D-${n}` : `${-n}일 전`; };
+  const renderKpi = () => {
+    const t = today(), d = new Date(t + 'T00:00:00'), end = new Date(d); end.setDate(d.getDate() + 6);
+    const live = db.shows.filter((s) => s.status !== '취소');
+    const next = live.filter((s) => s.date >= t && s.status !== '완료').sort(byDate)[0];
+    const week = live.filter((s) => s.date >= t && s.date <= ymd(end)).length;
+    const ym = t.slice(0, 7), month = live.filter((s) => s.date.startsWith(ym) && s.status !== '문의').length;
+    const inq = db.shows.filter((s) => s.status === '문의' && s.date >= t).length;
+    const late = db.shows.filter((s) => s.status === '확정' && s.date < t).length;
+    $('kpi').innerHTML = [
+      `<div><span>다음 공연</span><b style="font-size:16px">${next ? `${esc(next.date.slice(5).replace('-', '/'))}(${wd(next.date)}) ${esc(next.org)}` : '없음'}</b><span>${next ? dday(next.date) : ''}</span></div>`,
+      `<div><span>앞으로 7일</span><b>${week}건</b></div>`,
+      `<div><span>이번 달 확정·완료</span><b>${month}건</b></div>`,
+      `<div><span>답을 기다리는 문의</span><b>${inq}건</b></div>`,
+      late ? `<div style="border-color:var(--warn)"><span>지났는데 '확정'인 공연</span><b style="color:var(--warn)">${late}건</b><span>목록에서 '완료'로 바꿔 주세요</span></div>` : '',
+    ].join('');
+  };
+
+  // ── 달력 ──
+  let calYm = today().slice(0, 7);
+  const renderCal = () => {
+    const [y, m] = calYm.split('-').map(Number);
+    $('calTitle').textContent = `${y}년 ${m}월`;
+    const first = new Date(y, m - 1, 1), days = new Date(y, m, 0).getDate(), t = today();
+    let h = [...WD].map((w) => `<div class="w">${w}</div>`).join('');
+    for (let i = 0; i < first.getDay(); i++) h += '<div class="d empty"></div>';
+    for (let dd = 1; dd <= days; dd++) {
+      const iso = `${calYm}-${String(dd).padStart(2, '0')}`, sun = new Date(y, m - 1, dd).getDay() === 0;
+      const list = db.shows.filter((s) => s.date === iso).sort(byDate);
+      h += `<div class="d${iso === t ? ' today' : ''}" data-day="${iso}"><div class="n${sun ? ' sun' : ''}">${dd}</div>${list.map((s) => `<span class="chip ${esc(s.status)}" data-id="${esc(s.id)}" title="${esc(`${s.time || ''} ${s.org} ${s.show || ''}`)}">${esc(s.time ? s.time + ' ' : '')}${esc(s.org)}</span>`).join('')}</div>`;
+    }
+    $('calGrid').innerHTML = h;
+  };
+  const moveMonth = (n) => { const [y, m] = calYm.split('-').map(Number); calYm = ymd(new Date(y, m - 1 + n, 1)).slice(0, 7); renderCal(); };
+  $('prevM').addEventListener('click', () => moveMonth(-1));
+  $('nextM').addEventListener('click', () => moveMonth(1));
+  $('thisM').addEventListener('click', () => { calYm = today().slice(0, 7); renderCal(); });
+  $('calGrid').addEventListener('click', (e) => {
+    const chip = e.target.closest('[data-id]');
+    if (chip) { openEdit(chip.dataset.id); return; }
+    const day = e.target.closest('[data-day]');
+    if (day) { clearForm(); $('fDate').value = day.dataset.day; showTab('form'); $('fTime').focus(); }
+  });
+
+  // ── 목록 ──
+  const renderList = () => {
+    const t = today(), range = $('lRange').value, st = $('lStatus').value, q = $('lSearch').value.trim().toLowerCase();
+    let list = db.shows.filter((s) => range === 'all' || (range === 'up' ? s.date >= t : s.date < t));
+    if (st) list = list.filter((s) => s.status === st);
+    if (q) list = list.filter((s) => [s.org, s.event, s.show, s.region, s.person, s.memo].join(' ').toLowerCase().includes(q));
+    list.sort(byDate); if (range === 'past') list.reverse();
+    $('lCount').textContent = `${list.length}건`;
+    $('lBody').innerHTML = list.map((s) => `<tr class="pick" data-id="${esc(s.id)}">
+      <td>${esc(s.date)}(${wd(s.date)})${s.date >= t ? `<br><span class="dday">${dday(s.date)}</span>` : ''}</td>
+      <td>${esc(s.time)}</td><td><span class="st ${esc(s.status)}">${esc(s.status)}</span></td>
+      <td>${esc(s.org)}${s.event ? `<br><span class="small">${esc(s.event)}</span>` : ''}</td>
+      <td>${esc(s.show)}</td><td>${esc(s.region)}</td><td>${esc(s.person)}${s.phone ? `<br><span class="small">${esc(s.phone)}</span>` : ''}</td></tr>`).join('')
+      || '<tr><td colspan="7" class="small">공연이 없어요. [+ 공연 등록]에서 적어 주세요.</td></tr>';
+  };
+  ['lRange', 'lStatus'].forEach((id) => $(id).addEventListener('change', renderList));
+  $('lSearch').addEventListener('input', renderList);
+  $('lBody').addEventListener('click', (e) => { const tr = e.target.closest('[data-id]'); if (tr) openEdit(tr.dataset.id); });
+
+  // ── 등록 · 고치기 ──
+  const F = { date: 'fDate', time: 'fTime', status: 'fStatus', org: 'fOrg', event: 'fEvent', person: 'fPerson', phone: 'fPhone', region: 'fRegion', show: 'fShow', len: 'fLen', aud: 'fAud', addr: 'fAddr', memo: 'fMemo' };
+  let editing = null;
+  const clearForm = () => {
+    editing = null; Object.values(F).forEach((id) => { $(id).value = ''; }); $('fStatus').value = '문의';
+    $('fTitle').textContent = '새 공연 등록'; $('fDel').disabled = true; $('fCopy').disabled = true; $('fNotice').textContent = '';
+  };
+  const openEdit = (id) => {
+    const s = db.shows.find((x) => x.id === id); if (!s) return;
+    editing = id; Object.entries(F).forEach(([k, el]) => { $(el).value = s[k] || ''; });
+    $('fTitle').textContent = `공연 고치기 · ${s.date} ${s.org}`; $('fDel').disabled = false; $('fCopy').disabled = false;
+    checkOverlap(); showTab('form');
+  };
+  // 같은 날 다른 공연이 있으면 알려 준다 (시간이 2시간 안쪽이면 더 강하게)
+  const mins = (t) => { const m = /^(\d{1,2}):(\d{2})/.exec(t || ''); return m ? +m[1] * 60 + +m[2] : null; };
+  const checkOverlap = () => {
+    const date = $('fDate').value, t = mins($('fTime').value);
+    const same = db.shows.filter((s) => s.date === date && s.id !== editing && s.status !== '취소');
+    if (!date || !same.length) { $('fNotice').textContent = ''; return; }
+    const close = same.filter((s) => t !== null && mins(s.time) !== null && Math.abs(mins(s.time) - t) < 120);
+    $('fNotice').textContent = (close.length ? '⚠ 2시간 안에 다른 공연이 있어요: ' : '같은 날 다른 공연: ')
+      + (close.length ? close : same).map((s) => `${s.time || '시간 미정'} ${s.org}`).join(', ') + (close.length ? '\n이동 시간을 확인하세요.' : '');
+  };
+  ['fDate', 'fTime'].forEach((id) => $(id).addEventListener('change', checkOverlap));
+  $('fSave').addEventListener('click', () => {
+    const rec = {}; Object.entries(F).forEach(([k, el]) => { rec[k] = $(el).value.trim(); });
+    if (!rec.date) { toast('날짜를 골라 주세요.'); $('fDate').focus(); return; }
+    if (!rec.org) { toast('기관·행사처를 적어 주세요.'); $('fOrg').focus(); return; }
+    if (editing) { const s = db.shows.find((x) => x.id === editing); Object.assign(s, rec, { updatedAt: today() }); }
+    else { editing = 'S' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); db.shows.push({ id: editing, ...rec, createdAt: today() }); }
+    if (persist()) {
+      toast('저장했어요.'); renderAll(); $('fTitle').textContent = `공연 고치기 · ${rec.date} ${rec.org}`; $('fDel').disabled = false; $('fCopy').disabled = false;
+      if (rec.status === '확정' && rec.date < today()) toast("저장했어요. 지난 공연이면 상태를 '완료'로 바꿔 주세요.");
+    }
+  });
+  $('fNew').addEventListener('click', clearForm);
+  $('fCopy').addEventListener('click', () => { editing = null; $('fDate').value = ''; $('fStatus').value = '문의'; $('fTitle').textContent = '새 공연 등록 (복사)'; $('fDel').disabled = true; $('fCopy').disabled = true; $('fNotice').textContent = ''; toast('같은 내용으로 새 공연을 써요. 날짜를 골라 주세요.'); $('fDate').focus(); });
+  $('fDel').addEventListener('click', () => {
+    if (!editing) return; const s = db.shows.find((x) => x.id === editing);
+    if (!confirm(`${s.date} ${s.org} 공연을 지울까요? 되돌릴 수 없어요. (취소된 공연은 지우지 말고 상태를 '취소'로 바꿔 두는 방법도 있어요)`)) return;
+    db.shows = db.shows.filter((x) => x.id !== editing); persist(); clearForm(); renderAll(); showTab('list'); toast('지웠어요.');
+  });
+
+  // ── 내보내기 · 백업 ──
+  const icsEsc = (s) => String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+  $('btnIcs').addEventListener('click', () => {
+    const list = db.shows.filter((s) => s.status === '확정' && s.date >= today()).sort(byDate);
+    if (!list.length) { toast('앞으로의 확정 공연이 없어요.'); return; }
+    const stamp = new Date().toISOString().replace(/[-:]/g, '').slice(0, 15) + 'Z';
+    const ev = list.map((s) => {
+      const d = s.date.replace(/-/g, ''), m = mins(s.time);
+      let when;
+      if (m === null) { const n = new Date(s.date + 'T00:00:00'); n.setDate(n.getDate() + 1); when = [`DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${ymd(n).replace(/-/g, '')}`]; }
+      else { const hh = (x) => `${String(Math.floor(x / 60) % 24).padStart(2, '0')}${String(x % 60).padStart(2, '0')}00`; when = [`DTSTART:${d}T${hh(m)}`, `DTEND:${d}T${hh(m + 60)}`]; }
+      return ['BEGIN:VEVENT', `UID:${s.id}@itsshowtime-free`, `DTSTAMP:${stamp}`, ...when,
+        `SUMMARY:${icsEsc(`[공연] ${s.org}${s.show ? ' ' + s.show : ''}`)}`,
+        `LOCATION:${icsEsc(s.addr || s.region)}`, `DESCRIPTION:${icsEsc([s.event, s.len && '공연 ' + s.len, s.aud, s.memo].filter(Boolean).join('\n'))}`, 'END:VEVENT'].join('\r\n');
+    });
+    download(['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//itsshowtime//free schedule//KO', 'CALSCALE:GREGORIAN', ...ev, 'END:VCALENDAR'].join('\r\n'), `공연일정_${today()}.ics`, 'text/calendar');
+    toast(`확정 공연 ${list.length}건을 달력 파일로 받았어요.`);
+  });
+  $('btnCsv').addEventListener('click', () => {
+    const cols = [['date', '날짜'], ['time', '시간'], ['status', '상태'], ['org', '기관·행사처'], ['event', '행사 이름'], ['show', '공연'], ['region', '지역'], ['addr', '주소'], ['person', '담당자'], ['phone', '연락처'], ['len', '공연 시간'], ['aud', '관람 인원·연령'], ['memo', '메모']];
+    const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const rows = [cols.map((c) => q(c[1])).join(','), ...db.shows.slice().sort(byDate).map((s) => cols.map(([k]) => q(s[k])).join(','))];
+    download('\ufeff' + rows.join('\r\n'), `공연일정_${today()}.csv`, 'text/csv');
+  });
+  const renderBackup = () => { $('backupInfo').textContent = db.lastBackup ? `마지막 백업 ${db.lastBackup}` : '아직 백업을 받지 않았어요.'; };
+  $('btnExport').addEventListener('click', () => {
+    db.lastBackup = today(); persist();
+    download(JSON.stringify({ app: 'itsshowtime-schedule-free', v: 1, ...db }, null, 2), `일정관리_백업_${today()}.json`, 'application/json');
+    renderBackup(); renderAll();
+  });
+  $('fileImport').addEventListener('change', (e) => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const d = JSON.parse(r.result); if (d.app !== 'itsshowtime-schedule-free' || !Array.isArray(d.shows)) throw new Error();
+        if (!confirm(`지금 일정을 이 백업 파일(공연 ${d.shows.length}건)로 바꿀까요?`)) return;
+        db = { shows: d.shows, lastBackup: d.lastBackup || '' }; persist(); clearForm(); renderAll(); toast('백업 파일로 되돌렸어요.');
+      } catch (err) { toast('이 프로그램의 백업 파일이 아닌 것 같아요.'); }
+    };
+    r.readAsText(f, 'utf-8');
+  });
+
+  const renderAll = () => {
+    renderKpi(); renderCal(); renderList(); renderBackup();
+    $('showNames').innerHTML = [...new Set(db.shows.map((s) => s.show).filter(Boolean))].map((n) => `<option value="${esc(n)}">`).join('');
+    // 7일 넘게 백업하지 않았으면 알린다
+    const days = db.lastBackup ? Math.round((new Date(today()) - new Date(db.lastBackup)) / 86400000) : null;
+    if (db.shows.length >= 3 && (days === null || days >= 7) && !renderAll.warned) { renderAll.warned = true; setTimeout(() => toast('백업한 지 일주일이 넘었어요. [백업 · 내보내기]에서 백업 파일을 받아 두세요.'), 800); }
+  };
+
+  // ── 이츠쇼타임 무료 프로그램 받기: 받는 길은 무료 등록 구글폼 하나 (제출하면 다운로드 링크가 메일로 감)
+  const FREE_FORM = 'https://docs.google.com/forms/d/1FVzQvZ0b8lVir_1WYG728mkuPU9SsWdSsf4ER2vLUB4/viewform';
+  // ── 이츠쇼타임 무료 프로그램 받기 (세 프로그램 공통) ──
+  const FREE_APPS = [
+    { id: 'schedule', name: '일정관리', ready: true },
+    { id: 'blog', name: '블로그 도우미', ready: true },
+    { id: 'shorts', name: '쇼츠 메이커', ready: true },
+  ];
+  const THIS_APP = 'schedule';
+  $('freeApps').innerHTML = '<span class="lbl">이츠쇼타임 무료 프로그램</span>' + FREE_APPS.map((a) => a.id === THIS_APP
+    ? `<span class="app now">${esc(a.name)} · 지금 쓰는 중</span>`
+    : a.ready ? `<a href="${FREE_FORM}" target="_blank" rel="noopener" title="1분 무료 등록을 하면 다운로드 링크가 메일로 와요.">${esc(a.name)} 받기</a>`
+      : `<span class="app soon">${esc(a.name)} · 준비 중</span>`).join('')
+    + `<a href="${FREE_FORM}" target="_blank" rel="noopener">무료 등록 · 업데이트 소식 받기</a>`;
+
+  // ── 프리미엄 소개: 작게/크게 (이 PC에서만 기억) ──
+  const PREMIUM_KEY = 'itsshowtime_free_premium_mini';
+  const setPremium = (mini) => { $('premium').classList.toggle('mini', mini); $('premiumFold').textContent = mini ? '크게 보기' : '작게 보기'; };
+  try { setPremium(localStorage.getItem(PREMIUM_KEY) === '1'); } catch (e) { setPremium(false); }
+  $('premiumFold').addEventListener('click', () => {
+    const mini = !$('premium').classList.contains('mini'); setPremium(mini);
+    try { localStorage.setItem(PREMIUM_KEY, mini ? '1' : '0'); } catch (e) { /* 기억 못 해도 괜찮다 */ }
+  });
+
+  // ── 시작 ──
+  clearForm(); renderAll();
+})();
+</script>
+<script>
+  // 아이폰·아이패드를 사파리 창으로 열었을 때만: 홈 화면에 추가해서 쓰라고 알려 줌
+  (function () {
+    const ua = navigator.userAgent;
+    const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const standalone = navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    if (isIOS && !standalone && location.protocol !== 'file:') document.getElementById('iosNote').hidden = false;
+  })();
+</script>
+</body>
+</html>
